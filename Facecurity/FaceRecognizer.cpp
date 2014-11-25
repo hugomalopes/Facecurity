@@ -7,70 +7,70 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 using namespace cv;
 using namespace std;
 
-static void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
+static void read_csv(const string& filename, vector<Mat>& images, vector<int>& ids, unordered_map<int,string>& namesMap, char separator = ';') {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	cout << filename << endl;
 	if (!file) {
 		string error_message = "No valid input file was given, please check the given filename.";
 		CV_Error(CV_StsBadArg, error_message);
 	}
-	string line, path, classlabel;
+	string line, path, id, name;
 	while (getline(file, line)) {
 		stringstream liness(line);
 		getline(liness, path, separator);
-		getline(liness, classlabel);
-		if (!path.empty() && !classlabel.empty()) {
+		getline(liness, id, separator);
+		getline(liness, name);
+		if (!path.empty() && !id.empty() && !name.empty()) {
 			images.push_back(imread(path, 0));
-			labels.push_back(atoi(classlabel.c_str()));
+			ids.push_back(atoi(id.c_str()));
+			namesMap.insert({atoi(id.c_str()), name });
 		}
 	}
 }
 
 int main(int argc, const char *argv[]) {
-	const string fn_haar = "haarcascade_frontalface_default.xml";
-	const string fn_csv = "faces_csv.ext";
+	const string lbp_file = "lbpcascade_frontalface.xml";
+	const string csv_file = "faces_csv.ext";
 	const int deviceId = 0;
 
 	// These vectors hold the images and corresponding labels:
 	vector<Mat> images;
-	vector<int> labels;
+	vector<int> ids;
+	unordered_map<int, string> namesMap;
+
 	// Read in the data (fails if no valid input filename is given, but you'll get an error message):
 	try {
-		read_csv(fn_csv, images, labels);
+		read_csv(csv_file, images, ids, namesMap);
 	}
 	catch (cv::Exception& e) {
-		cerr << "Error opening file \"" << fn_csv << "\". Reason: " << e.msg << endl;
-		// nothing more we can do
+		cerr << "Error opening file \"" << csv_file << "\". Reason: " << e.msg << endl;
 		exit(1);
 	}
-	cout << "Train done with " << images.size() << " images." << endl;
-	// Get the height from the first image. We'll need this
-	// later in code to reshape the images to their original
-	// size AND we need to reshape incoming faces to this size:
+	// Get the height from the first image.
+	// Used to reshape the incoming faces this size
 	int im_width = images[0].cols;
 	int im_height = images[0].rows;
-	// Create a FaceRecognizer and train it on the given images:
+	
+	// Create a FaceRecognizer and train it on the given images
 	Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-	model->train(images, labels);
-	// That's it for learning the Face Recognition model. You now
-	// need to create the classifier for the task of Face Detection.
-	// We are going to use the haar cascade you have specified in the
-	// command line arguments:
-	//
-	CascadeClassifier haar_cascade;
-	haar_cascade.load(fn_haar);
+	model->train(images, ids);
+	
+	// Create a Cascade Classifier using the xml file specifed.
+	CascadeClassifier classifier;
+	classifier.load(lbp_file);
+
 	// Get a handle to the Video device:
 	VideoCapture cap(deviceId);
-	// Check if we can use this device at all:
 	if (!cap.isOpened()) {
 		cerr << "Capture Device ID " << deviceId << "cannot be opened." << endl;
 		return -1;
 	}
-	// Holds the current frame from the Video device:
+	// Holds the current frame from the webcam:
 	Mat frame;
 	for (;;) {
 		cap >> frame;
@@ -81,40 +81,27 @@ int main(int argc, const char *argv[]) {
 		cvtColor(original, gray, CV_BGR2GRAY);
 		// Find the faces in the frame:
 		vector< Rect_<int> > faces;
-		haar_cascade.detectMultiScale(gray, faces);
-		// At this point you have the position of the faces in
-		// faces. Now we'll get the faces, make a prediction and
-		// annotate it in the video. Cool or what?
+		classifier.detectMultiScale(gray, faces);
+		// Checks if it's only one person at the image
 		if (faces.size() > 1)
-			putText(original, "UMA PESSOA DE CADA VEZ", Point(10, 20), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2.0);
+			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2.0);
 		else if(faces.size() == 1){
-			// Crop the face from the image. So simple with OpenCV C++:
+			// Crop the face from the image
 			Mat face = gray(faces[0]);
-			// Resizing the face is necessary for Eigenfaces and Fisherfaces. You can easily
-			// verify this, by reading through the face recognition tutorial coming with OpenCV.
-			// Resizing IS NOT NEEDED for Local Binary Patterns Histograms, so preparing the
-			// input data really depends on the algorithm used.
-			//
-			// I strongly encourage you to play around with the algorithms. See which work best
-			// in your scenario, LBPH should always be a contender for robust face recognition.
-			//
-			// Since I am showing the Fisherfaces algorithm here, I also show how to resize the
-			// face you have just found:
+			// Resizing the face is necessary for Fisherfaces algotithm
 			Mat face_resized;
 			cv::resize(face, face_resized, Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
-			// Now perform the prediction, see how easy that is:
+			// Now perform the prediction
 			int prediction = model->predict(face_resized);
-			// And finally write all we've found out to the original image!
-			// First of all draw a green rectangle around the detected face:
-			rectangle(original, faces[0], CV_RGB(0, 255, 0), 1);
-			// Create the text we will annotate the box with:
-			string box_text = format("Prediction = %d", prediction);
-			// Calculate the position for annotated text (make sure we don't
-			// put illegal values in there):
+			// Draw a green rectangle around the detected face
+			rectangle(original, faces[0], CV_RGB(255, 255, 255), 1);
+			// Create the text we will annotate the box with
+			string box_text = namesMap.at(prediction);
+			// Calculate the position for annotated text
 			int pos_x = std::max(faces[0].tl().x - 10, 0);
 			int pos_y = std::max(faces[0].tl().y - 10, 0);
 			// And now put it into the image:
-			putText(original, box_text, Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);
+			putText(original, box_text, Point(pos_x+75, pos_y-50), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(255, 255, 255), 1.5);
 		}
 		// Show the result:
 		imshow("face_recognizer", original);
