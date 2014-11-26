@@ -1,8 +1,4 @@
-#include "opencv2/core/core.hpp"
-#include "opencv2/contrib/contrib.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/objdetect/objdetect.hpp"
+#include "FaceBuilder.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,54 +8,31 @@
 using namespace cv;
 using namespace std;
 
-static void read_csv(const string& filename, vector<Mat>& images, vector<int>& ids, unordered_map<int,string>& namesMap, char separator = ';') {
-	std::ifstream file(filename.c_str(), ifstream::in);
-	cout << filename << endl;
-	if (!file) {
-		string error_message = "No valid input file was given, please check the given filename.";
-		CV_Error(CV_StsBadArg, error_message);
-	}
-	string line, path, id, name;
-	while (getline(file, line)) {
-		stringstream liness(line);
-		getline(liness, path, separator);
-		getline(liness, id, separator);
-		getline(liness, name);
-		if (!path.empty() && !id.empty() && !name.empty()) {
-			images.push_back(imread(path, 0));
-			ids.push_back(atoi(id.c_str()));
-			namesMap.insert({atoi(id.c_str()), name });
-		}
-	}
-}
-
 int main(int argc, const char *argv[]) {
 	const string lbp_file = "lbpcascade_frontalface.xml";
-	const string csv_file = "faces_csv.ext";
 	const int deviceId = 0;
-
-	// These vectors hold the images and corresponding labels:
-	vector<Mat> images;
-	vector<int> ids;
+	FaceBuilder *faceBuilder = new FaceBuilder();
 	unordered_map<int, string> namesMap;
 
 	// Read in the data (fails if no valid input filename is given, but you'll get an error message):
 	try {
-		read_csv(csv_file, images, ids, namesMap);
+		faceBuilder->readCSV();
 	}
 	catch (cv::Exception& e) {
-		cerr << "Error opening file \"" << csv_file << "\". Reason: " << e.msg << endl;
+		cerr << "Error opening file \"" << "file" << "\". Reason: " << e.msg << endl; //mudar depois
 		exit(1);
 	}
+	namesMap = faceBuilder->getNamesMap();
 	// Get the height from the first image.
 	// Used to reshape the incoming faces this size
-	int im_width = images[0].cols;
-	int im_height = images[0].rows;
+	int im_width = faceBuilder->getImages()[0].cols;
+	int im_height = faceBuilder->getImages()[0].rows;
 	
 	// Create a FaceRecognizer and train it on the given images
 	Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-	model->train(images, ids);
+	model->train(faceBuilder->getImages(), faceBuilder->getIdentifiers());
 	
+	delete faceBuilder;
 	// Create a Cascade Classifier using the xml file specifed.
 	CascadeClassifier classifier;
 	classifier.load(lbp_file);
