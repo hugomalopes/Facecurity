@@ -106,10 +106,23 @@ int main(int argc, const char *argv[]) {
 		// Show the result:
 		imshow("face_recognizer", original);
 		// And display it:
-		char key = (char)waitKey(10);
+		char key = (char)waitKey(1);
 		// Exit this loop on escape:
 		if (key == 27)
 			break;
+		if (key == 8) {
+			// cap contains the frame at the key pressed momment
+			Mat save_img; 
+			cap >> save_img;
+			if (save_img.empty())
+			{
+				std::cerr << "Something is wrong with the webcam, could not get frame." << std::endl;
+			}
+			else {
+				imwrite("faces/facetest.jpg", save_img); // save as jpg in faces folder
+				std::cout << "Frame saved successfully" << std::endl;
+			}
+		}
 	}
 	return 0;
 }
