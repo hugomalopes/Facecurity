@@ -84,7 +84,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FaceLoader.cpp" />
     <ClCompile Include="FaceRecognizer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FaceLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

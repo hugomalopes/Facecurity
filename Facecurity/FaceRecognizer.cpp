@@ -1,4 +1,4 @@
-#include "FaceBuilder.h"
+#include "FaceLoader.h"
 
 #include <iostream>
 #include <fstream>
@@ -11,28 +11,28 @@ using namespace std;
 int main(int argc, const char *argv[]) {
 	const string lbp_file = "lbpcascade_frontalface.xml";
 	const int deviceId = 0;
-	FaceBuilder *faceBuilder = new FaceBuilder();
+	FaceLoader *faceLoader = new FaceLoader();
 	unordered_map<int, string> namesMap;
 
 	// Read in the data (fails if no valid input filename is given, but you'll get an error message):
 	try {
-		faceBuilder->readCSV();
+		faceLoader->readCSV();
 	}
 	catch (cv::Exception& e) {
 		cerr << "Error opening file \"" << "file" << "\". Reason: " << e.msg << endl; //mudar depois
 		exit(1);
 	}
-	namesMap = faceBuilder->getNamesMap();
+	namesMap = faceLoader->getNamesMap();
 	// Get the height from the first image.
 	// Used to reshape the incoming faces this size
-	int im_width = faceBuilder->getImages()[0].cols;
-	int im_height = faceBuilder->getImages()[0].rows;
+	int im_width = faceLoader->getImages()[0].cols;
+	int im_height = faceLoader->getImages()[0].rows;
 	
 	// Create a FaceRecognizer and train it on the given images
 	Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-	model->train(faceBuilder->getImages(), faceBuilder->getIdentifiers());
+	model->train(faceLoader->getImages(), faceLoader->getIdentifiers());
 	
-	delete faceBuilder;
+	delete faceLoader;
 	// Create a Cascade Classifier using the xml file specifed.
 	CascadeClassifier classifier;
 	classifier.load(lbp_file);
