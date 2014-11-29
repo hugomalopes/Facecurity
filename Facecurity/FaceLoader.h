@@ -20,7 +20,7 @@ class FaceLoader
 	vector<Mat> images;
 	vector<int> ids;
 	unordered_map<int, string> namesMap;
-	const string csv_file = "faces_csv.ext";
+	const string csv_file;
 
 	public:
 		FaceLoader();

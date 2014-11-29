@@ -1,6 +1,6 @@
 #include "FaceLoader.h"
 
-FaceLoader::FaceLoader()
+FaceLoader::FaceLoader() : csv_file("faces_csv.ext")
 {
 }
 
