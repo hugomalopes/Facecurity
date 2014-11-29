@@ -1,3 +1,4 @@
+#include "FaceRecognizer.h"
 #include "FaceLoader.h"
 
 #include <iostream>
@@ -8,7 +9,7 @@
 using namespace cv;
 using namespace std;
 
-int main(int argc, const char *argv[]) {
+void startRecognition(){
 	const string lbp_file = "lbpcascade_frontalface.xml";
 	const int deviceId = 0;
 	FaceLoader *faceLoader = new FaceLoader();
@@ -41,7 +42,7 @@ int main(int argc, const char *argv[]) {
 	VideoCapture cap(deviceId);
 	if (!cap.isOpened()) {
 		cerr << "Capture Device ID " << deviceId << "cannot be opened." << endl;
-		return -1;
+		return;
 	}
 	// Holds the current frame from the webcam:
 	Mat frame;
@@ -97,5 +98,4 @@ int main(int argc, const char *argv[]) {
 			}
 		}
 	}
-	return 0;
 }
