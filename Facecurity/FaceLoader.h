@@ -29,6 +29,6 @@ class FaceLoader
 		vector<Mat> getImages();
 		vector<int> getIdentifiers();
 		unordered_map<int, string> getNamesMap();
-		void readCSV();
+		int readCSV();
 };
 

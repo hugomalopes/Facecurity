@@ -16,10 +16,11 @@ vector<int> FaceLoader::getIdentifiers() { return ids; }
 
 unordered_map<int, string> FaceLoader::getNamesMap() { return namesMap; }
 
-void FaceLoader::readCSV() {
+//returns the number of persons registered
+int FaceLoader::readCSV() {
+	int lastId = -1;
 	char separator = ';';
 	std::ifstream file(getFilename().c_str(), ifstream::in);
-	cout << getFilename() << endl;
 	if (!file) {
 		string error_message = "No valid input file was given, please check the given filename.";
 		CV_Error(CV_StsBadArg, error_message);
@@ -32,8 +33,10 @@ void FaceLoader::readCSV() {
 		getline(liness, name);
 		if (!path.empty() && !id.empty() && !name.empty()) {
 			images.push_back(imread(path, 0));
-			ids.push_back(atoi(id.c_str()));
-			namesMap.insert({ atoi(id.c_str()), name });
+			ids.push_back(stoi(id));
+			namesMap.insert({stoi(id), name });
+			lastId = stoi(id);
 		}
 	}
+	return lastId;
 }
