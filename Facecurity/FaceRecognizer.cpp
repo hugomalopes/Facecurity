@@ -57,11 +57,12 @@ void startRecognition(){
 		vector< Rect_<int> > faces;
 		classifier.detectMultiScale(gray, faces);
 		// Checks if it's only one person at the image
+		Mat face;
 		if (faces.size() > 1)
 			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2.0);
 		else if(faces.size() == 1){
 			// Crop the face from the image
-			Mat face = gray(faces[0]);
+			face = gray(faces[0]);
 			// Resizing the face is necessary for Fisherfaces algotithm
 			Mat face_resized;
 			cv::resize(face, face_resized, Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
@@ -86,14 +87,12 @@ void startRecognition(){
 			break;
 		if (key == 8) {
 			// cap contains the frame at the key pressed momment
-			Mat save_img; 
-			cap >> save_img;
-			if (save_img.empty())
+			if (face.empty())
 			{
 				std::cerr << "Something is wrong with the webcam, could not get frame." << std::endl;
 			}
 			else {
-				imwrite("faces/facetest.jpg", save_img); // save as jpg in faces folder
+				imwrite("faces/facetest.jpg", face); // save as jpg in faces folder
 				std::cout << "Frame saved successfully" << std::endl;
 			}
 		}
