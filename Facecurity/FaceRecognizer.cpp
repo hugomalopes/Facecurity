@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <string>
 
 using namespace cv;
 using namespace std;
@@ -14,6 +15,8 @@ void startRecognition(){
 	const int deviceId = 0;
 	FaceLoader *faceLoader = new FaceLoader();
 	unordered_map<int, string> namesMap;
+	int label_predicted;
+	double confidence_predicted;
 
 	// Read in the data (fails if no valid input filename is given, but you'll get an error message):
 	try {
@@ -68,6 +71,10 @@ void startRecognition(){
 			cv::resize(face, face_resized, Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
 			// Now perform the prediction
 			int prediction = model->predict(face_resized);
+
+			model->predict(face_resized, label_predicted, confidence_predicted);
+			putText(original, namesMap.at(label_predicted) + " l - c " + to_string(confidence_predicted), Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2.0);
+
 			// Draw a green rectangle around the detected face
 			rectangle(original, faces[0], CV_RGB(255, 255, 255), 1);
 			// Create the text we will annotate the box with

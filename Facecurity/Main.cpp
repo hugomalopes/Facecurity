@@ -6,6 +6,7 @@ using namespace std;
 int main(){
 	char option;
 	string username;
+	FaceSetup *faceSetup = new FaceSetup();
 
 	cout << "=======================\nWelcome to Facecurity\n=======================" << endl;
 	cout << " Choose one of the following options:\n 1 - Setup\n 2 - Recognizer" << endl;
@@ -16,7 +17,7 @@ int main(){
 	case 's':
 		cout << "Insert username: ";
 		cin >> username;
-		startSetup(username);
+		faceSetup->startSetup(username);
 		break;
 	case '2':
 	case 'r':
