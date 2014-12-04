@@ -17,25 +17,28 @@ using namespace std;
 
 class FaceSetup
 {
-	const string faces_csv_file;
-	const string haar_profileface_file;
-	const string lbp_frontalface_file;
-	const string lbp_profileface_file;
-	const string haar_smile_file;
-	const int deviceId;
+	const string FACES_CSV_FILE;
+	const string HAAR_PROFILEFACE_FILE;
+	const string LBP_FRONTALFACE_FILE;
+	const string LBP_PROFILEFACE_FILE;
+	const string HAAR_SMILE_FILE;
+	const int DEVICEID;
 	// Used to reshape the faces this size
-	const int im_width;
-	const int im_height;
-
+	const int IM_WIDTH;
+	const int IM_HEIGHT;
+	const double MIN_BRIGHTNESS;
 	const int NUM_PHOTOS;
+
+private:
+	void getBrightness(Mat& frame, double& brightness);
+	void wait(VideoCapture cap, string msg);
+	void brightnessCheck(VideoCapture cap);
+	void frontalFacePrepare(VideoCapture cap);
+	void frontalFaceSnapshot(VideoCapture cap, string username);
 
 public:
 	FaceSetup();
 	~FaceSetup();
-	void getBrightness(Mat& frame, double& brightness);
-	void wait(VideoCapture cap);
-	void brightnessCheck (VideoCapture cap);
-	void frontalFaceSnapshot(VideoCapture cap, string username);
 	void startSetup(string username);
 };
 
