@@ -54,7 +54,7 @@ void FaceSetup::wait(VideoCapture cap, string msg) {
 		Mat original = frame.clone();
 
 		// Put the message in the frame
-		putText(original, msg, Point(20, 30), FONT_HERSHEY_SIMPLEX, 0.6, CV_RGB(100, 255, 0), 1);
+		putText(original, msg, Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 
 		// Show the image from cam
 		imshow(WINDOW_NAME, original);
@@ -79,7 +79,7 @@ void FaceSetup::brightnessCheck(VideoCapture cap) {
 		getBrightness(frame, brightness);
 
 		if(brightness > MIN_BRIGHTNESS) {
-			putText(original, "Luminosity ok. Press space to continue." + to_string(brightness), Point(20, 30), FONT_HERSHEY_SIMPLEX, 0.6, CV_RGB(100, 255, 0), 1);
+			putText(original, "LUMINOSITY OK. PRESS SPACE TO CONTINUE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 
@@ -89,7 +89,7 @@ void FaceSetup::brightnessCheck(VideoCapture cap) {
 				break;
 		}
 		else {
-			putText(original, "Luminosity is not ok, please try to improve it.", Point(20, 30), FONT_HERSHEY_SIMPLEX, 0.6, CV_RGB(175, 0, 0), 1);
+			putText(original, "SWITCH ON THE LIGHTS OR GO TO A BRIGHTER PLACE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			char key = (char)waitKey(5);
@@ -118,7 +118,7 @@ void FaceSetup::frontalFacePrepare(VideoCapture cap) {
 		// Checks if it's only one person at the image
 		Mat face, face_resized;
 		if (faces.size() > 1) {
-			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			char key = (char)waitKey(5);
@@ -128,6 +128,7 @@ void FaceSetup::frontalFacePrepare(VideoCapture cap) {
 			face = gray(faces[0]);
 			rectangle(original, faces[0], CV_RGB(255, 255, 255), 1);
 
+			putText(original, "FACE DETECTED. KEEP IT STABILIZED AND PRESS SPACE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			// Only allows to proceed if it is detecting a face
@@ -136,8 +137,11 @@ void FaceSetup::frontalFacePrepare(VideoCapture cap) {
 			if (key == 32)
 				break;
 		}
-		imshow(WINDOW_NAME, original);
-		char key = (char)waitKey(5);
+		else {
+			putText(original, "STABILIZE YOUR FACE AT THE CENTER.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
+			imshow(WINDOW_NAME, original);
+			char key = (char)waitKey(5);
+		}	
 	}
 }
 
@@ -168,7 +172,7 @@ void FaceSetup::frontalFaceSnapshot(VideoCapture cap) {
 		// Checks if it's only one person at the image
 		Mat face, face_resized;
 		if (faces.size() > 1)
-			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
 		else if (faces.size() == 1){
 			// Crop the face from the image
 			face = gray(faces[0]);
@@ -180,15 +184,22 @@ void FaceSetup::frontalFaceSnapshot(VideoCapture cap) {
 				string filename = username + to_string(photosTaken);
 				imwrite("faces/" + filename + "_frontalface.jpg", face_resized); // save as jpg in faces folder
 				string output = "faces/" + filename + "_frontalface.jpg;" + to_string(id) + ";" + username;
-				putText(original, "TAKING PHOTO " + to_string(photosTaken), Point(220, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+				putText(original, "MEMORIZING YOUR FACE: " + to_string(photosTaken*100/NUM_PHOTOS) + "%", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 				photosTaken++;
 
 				myfile << output << endl;
+
+				// Show the image from cam
+				imshow(WINDOW_NAME, original);
+				char key = (char)waitKey(5);
 			}
 		}
-		// Show the image from cam
-		imshow(WINDOW_NAME, original);
-		char key = (char)waitKey(5);
+		else {
+			putText(original, "HOLD ON PLEASE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
+			// Show the image from cam
+			imshow(WINDOW_NAME, original);
+			char key = (char)waitKey(5);
+		}
 	}
 	myfile << endl;
 	myfile.close();
@@ -215,12 +226,12 @@ void FaceSetup::smilePrepare(VideoCapture cap) {
 		// Checks if it's only one person at the image
 		Mat face;
 		if (faces.size() > 1) {
-			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			char key = (char)waitKey(5);
 		}
-		else if (faces.size() == 1){
+		else if (faces.size() == 1) {
 			// Crop the face from the image
 			face = gray(faces[0]);
 			
@@ -246,6 +257,7 @@ void FaceSetup::smilePrepare(VideoCapture cap) {
 					rectangle(original, smileRect, CV_RGB(255, 255, 255), 1);
 				}
 			}
+			putText(original, "SMILE DETECTED. PRESS SPACE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			// Only allows to proceed if it is detecting a face
@@ -254,8 +266,11 @@ void FaceSetup::smilePrepare(VideoCapture cap) {
 			if (key == 32)
 				break;
 		}
-		imshow(WINDOW_NAME, original);
-		char key = (char)waitKey(5);
+		else {
+			putText(original, "STAY FUNNY AND SMILE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
+			imshow(WINDOW_NAME, original);
+			char key = (char)waitKey(5);
+		}
 	}
 }
 
@@ -286,12 +301,12 @@ void FaceSetup::smileSnapshot(VideoCapture cap) {
 		// Checks if it's only one person at the image
 		Mat face, face_resized;;
 		if (faces.size() > 1) {
-			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(180, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+			putText(original, "ONE PERSON AT A TIME, PLEASE", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
 			// Show the image from cam
 			imshow(WINDOW_NAME, original);
 			char key = (char)waitKey(5);
 		}
-		else if (faces.size() == 1){
+		else if (faces.size() == 1) {
 			// Crop the face from the image
 			face = gray(faces[0]);
 			
@@ -318,29 +333,34 @@ void FaceSetup::smileSnapshot(VideoCapture cap) {
 
 					// Resizing the face is necessary for Fisherfaces algotithm
 					cv::resize(face, face_resized, Size(IM_WIDTH, IM_HEIGHT), 1.0, 1.0, INTER_CUBIC);
-					rectangle(original, faces[0], CV_RGB(255, 255, 255), 1);
-
 					if (!face_resized.empty()){
 						string filename = username + to_string(photosTaken);
 						imwrite("faces/" + filename + "_smile.jpg", face_resized); // save as jpg in faces folder
 						string output = "faces/" + filename + "_smile.jpg;" + to_string(id) + ";" + username;
-						putText(original, "TAKING PHOTO " + to_string(photosTaken), Point(220, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 2);
+						putText(original, "MEMORIZING YOUR SMILE: " + to_string(photosTaken*100/NUM_PHOTOS) + "%", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 						photosTaken++;
 
 						myfile << output << endl;
+
+						// Show the image from cam
+						imshow(WINDOW_NAME, original);
+						char key = (char)waitKey(5);
 					}
 				}
 			}
-			// Show the image from cam
-			imshow(WINDOW_NAME, original);
-			// Only allows to proceed if it is detecting a face
-			char key = (char)waitKey(5);
-			// Exit this loop on escape:
-			if (key == 32)
-				break;
+			else {
+				putText(original, "SMILE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
+				// Show the image from cam
+				imshow(WINDOW_NAME, original);
+				char key = (char)waitKey(5);
+			}
+
 		}
-		imshow(WINDOW_NAME, original);
-		char key = (char)waitKey(5);
+		else {
+			putText(original, "SMILE.", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(175, 0, 0), 1);
+			imshow(WINDOW_NAME, original);
+			char key = (char)waitKey(5);
+		}
 	}
 	myfile << endl;
 	myfile.close();
@@ -355,7 +375,7 @@ void FaceSetup::startSetup(){
 		return;
 	}
 
-	wait(cap, "Follow the tips given in each step. Press space to start.");
+	wait(cap, "FOLLOW THE TIPS GIVEN IN EACH STEP. PRESS SPACE TO START.");
 	brightnessCheck(cap);
 	frontalFacePrepare(cap);
 	frontalFaceSnapshot(cap);
