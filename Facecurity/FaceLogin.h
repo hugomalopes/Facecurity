@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <string>
 #include <unordered_map>
 #include "opencv2/core/core.hpp"
 #include "opencv2/contrib/contrib.hpp"
@@ -14,22 +15,18 @@
 using namespace cv;
 using namespace std;
 
-class FaceLoader
+class FaceLogin
 {
 	private:
-		const string csv_file;
-		// These vectors hold the images and corresponding labels:
-		vector<Mat> images;
-		vector<int> ids;
+		const string LBP_FRONTALFACE_FILE;
+		const int DEVICEID;
 		unordered_map<int, string> namesMap;
+		Ptr<FaceRecognizer> model;
+		int im_width;
+		int im_height;
 
 	public:
-		FaceLoader();
-		~FaceLoader();
-		string getFilename();
-		vector<Mat> getImages();
-		vector<int> getIdentifiers();
-		unordered_map<int, string> getNamesMap();
-		int readCSV();
+		FaceLogin();
+		~FaceLogin();
+		void startRecognition();
 };
-

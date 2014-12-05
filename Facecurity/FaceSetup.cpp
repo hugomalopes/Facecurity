@@ -6,14 +6,13 @@ FaceSetup::FaceSetup(string uname) : WINDOW_NAME("Facecurity - Setup"),
 						HAAR_FRONTALFACE_FILE("haarcascade_frontalface_default.xml"),
 						HAAR_PROFILEFACE_FILE("haarcascade_profileface.xml"),
 						HAAR_SMILE_FILE("haarcascade_smile.xml"),
-						HAAR_MOUTH_FILE("haarcascade_mcs_mouth.xml"),
 						LBP_FRONTALFACE_FILE("lbpcascade_frontalface.xml"),
 						LBP_PROFILEFACE_FILE("lbpcascade_profileface.xml"),
 						DEVICEID(0),
 						IM_WIDTH(240),
 						IM_HEIGHT(240),
 						MIN_BRIGHTNESS(0.95),
-						NUM_PHOTOS(30) { 
+						NUM_PHOTOS(20) { 
 	username = uname;
 
 	FaceLoader *faceLoader = new FaceLoader();
@@ -24,6 +23,8 @@ FaceSetup::FaceSetup(string uname) : WINDOW_NAME("Facecurity - Setup"),
 		cerr << "Error opening file \"" << "file" << "\". Reason: " << e.msg << endl; //mudar depois
 		exit(1);
 	}
+
+	delete(faceLoader);
 }
 
 FaceSetup::~FaceSetup() {}
@@ -236,7 +237,7 @@ void FaceSetup::smilePrepare(VideoCapture cap) {
 			face = gray(faces[0]);
 			
 			CascadeClassifier smileClassifier;
-			smileClassifier.load(HAAR_MOUTH_FILE);
+			smileClassifier.load(HAAR_SMILE_FILE);
 			vector<Rect_<int>> smiles;
 			smileClassifier.detectMultiScale(face, smiles);
 
@@ -311,7 +312,7 @@ void FaceSetup::smileSnapshot(VideoCapture cap) {
 			face = gray(faces[0]);
 			
 			CascadeClassifier smileClassifier;
-			smileClassifier.load(HAAR_MOUTH_FILE);
+			smileClassifier.load(HAAR_SMILE_FILE);
 			vector<Rect_<int>> smiles;
 			smileClassifier.detectMultiScale(face, smiles);
 
