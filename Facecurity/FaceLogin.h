@@ -24,14 +24,21 @@ class FaceLogin
 		const int DEVICEID;
 		const double CONFIDENCETHRESHOLD;
 		const int FACERECOGNITIONTIME;
+		const int ACCESSDENYTIME;
+		int personDetected;
+		int challenge;
 		unordered_map<int, string> namesMap;
 		Ptr<FaceRecognizer> model;
 		int im_width;
 		int im_height;
-		void recognizeFrontalFace(VideoCapture cap);
+		void preliminarRecognition(VideoCapture cap);
+		bool challengeRecognitionSmile(VideoCapture cap);
+		bool challengeRecognitionNoSmile(VideoCapture cap);
+		void accessDeny(VideoCapture cap);
+		void accessGranted(VideoCapture cap);
 
 	public:
 		FaceLogin();
 		~FaceLogin();
-		void startRecognition();
+		int startRecognition();
 };

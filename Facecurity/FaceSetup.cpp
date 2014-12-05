@@ -27,7 +27,7 @@ FaceSetup::FaceSetup(string uname) : WINDOW_NAME("Facecurity - Setup"),
 	unordered_map<int, string> namesMap = faceLoader->getNamesMap();
 	for(auto entry : namesMap) {
 		if(username == entry.second) {
-			cerr << "The user " + username + " is already registered." << endl;
+			cerr << "The user " << username << " is already registered." << endl;
 			exit(1);
 		}
 	}
