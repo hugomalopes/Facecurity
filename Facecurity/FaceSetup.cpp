@@ -24,6 +24,14 @@ FaceSetup::FaceSetup(string uname) : WINDOW_NAME("Facecurity - Setup"),
 		exit(1);
 	}
 
+	unordered_map<int, string> namesMap = faceLoader->getNamesMap();
+	for(auto entry : namesMap) {
+		if(username == entry.second) {
+			cerr << "The user " + username + " is already registered." << endl;
+			exit(1);
+		}
+	}
+
 	delete(faceLoader);
 }
 
@@ -184,7 +192,7 @@ void FaceSetup::frontalFaceSnapshot(VideoCapture cap) {
 			if (!face_resized.empty()){
 				string filename = username + to_string(photosTaken);
 				imwrite("faces/" + filename + "_frontalface.jpg", face_resized); // save as jpg in faces folder
-				string output = "faces/" + filename + "_frontalface.jpg;" + to_string(id) + ";" + username;
+				string output = "faces/" + filename + "_frontalface.jpg;" + to_string(id) + ";" + username + "_frontalface";
 				putText(original, "MEMORIZING YOUR FACE: " + to_string(photosTaken*100/NUM_PHOTOS) + "%", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 				photosTaken++;
 
@@ -204,6 +212,7 @@ void FaceSetup::frontalFaceSnapshot(VideoCapture cap) {
 	}
 	myfile << endl;
 	myfile.close();
+	id++;
 }
 
 void FaceSetup::smilePrepare(VideoCapture cap) {
@@ -337,7 +346,7 @@ void FaceSetup::smileSnapshot(VideoCapture cap) {
 					if (!face_resized.empty()){
 						string filename = username + to_string(photosTaken);
 						imwrite("faces/" + filename + "_smile.jpg", face_resized); // save as jpg in faces folder
-						string output = "faces/" + filename + "_smile.jpg;" + to_string(id) + ";" + username;
+						string output = "faces/" + filename + "_smile.jpg;" + to_string(id) + ";" + username + "_smile";
 						putText(original, "MEMORIZING YOUR SMILE: " + to_string(photosTaken*100/NUM_PHOTOS) + "%", Point(20, 30), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(100, 255, 0), 1);
 						photosTaken++;
 
@@ -365,6 +374,7 @@ void FaceSetup::smileSnapshot(VideoCapture cap) {
 	}
 	myfile << endl;
 	myfile.close();
+	id++;
 }
 
 void FaceSetup::startSetup(){
